@@ -5,8 +5,12 @@
 
 #### [Data Structures][1]
 - [Linked List][2]
+- [Stack][3]
+- [Queue][4]
 
 
 
-[1]: https://github.com/pwyq/Algorithm/tree/master/Data-Structures
-[2]: https://github.com/pwyq/Algorithm/blob/master/Data-Structures/linkedlistsoln.cpp
+[1]: https://git.io/v5jqO
+[2]: https://git.io/v5jqT
+[3]: https://git.io/v5jqZ
+[4]: https://git.io/v5jqG

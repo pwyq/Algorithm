@@ -1,4 +1,4 @@
-### Linked List
+### Stack
 
 #### Algorithms
 
