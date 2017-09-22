@@ -47,7 +47,6 @@ int* selectionSort(int * array) {
     }
 
     return array;
-    
 }
 
 void print(int * array){
@@ -69,7 +68,6 @@ int main() {
     std::cout << "After sorting..." << std::endl;
 
     selectionSort(array);
-
     print(array);
 
     return 0;
