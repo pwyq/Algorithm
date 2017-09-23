@@ -2,7 +2,7 @@
  * File              : selection-sort.cpp
  * Author            : Yanqing Wu <meet.yanqing.wu@gmail.com>
  * Date              : 21.09.2017
- * Last Modified Date: 21.09.2017
+ * Last Modified Date: 22.09.2017
  * Last Modified By  : Yanqing Wu <meet.yanqing.wu@gmail.com>
  */
 
@@ -13,6 +13,11 @@
 //
 
 #include <iostream>
+
+// Signature of functions
+void swap(int &x, int &y);
+int* selectionSort(int * array);
+void print(int * array);
 
 void swap(int &x, int &y) {
     int temp;
@@ -25,15 +30,23 @@ void swap(int &x, int &y) {
 
 // Take array as input and return an int array.
 int* selectionSort(int * array) {
-    static unsigned int start_point = 0;
-    bool isSwapped = false;
-    int pos = -1;
+    static unsigned int start_point = 0;    // Define a starting point
+    bool isSwapped = false;                 // Define a boolean flag
+    int pos = -1;                           // Define a int to store position
 
-    int tempSmall = array[start_point];
+    int tempSmall = array[start_point];     // Define a temporary variable to store the smallest int
 
+    // If there exists multiple occurrences of a same smallest value, then this algorithm
+    // will swapped the last occurrence of the smallest value with start-point.
+
+    std::cout << "\n start-point: " << start_point << ", value = " << array[start_point] << std::endl;
+    // Start from the starting, loop to the end of the loop.
     for (int i = start_point; i < 20; i++) {
+        std::cout << "\n i = " << i << "." << std::endl;
+
         if (tempSmall >= array[i]) {
-            std::cout << "tempSmall = " << tempSmall << ", array[i] = " << array[i] << std::endl;
+            print(array);
+            std::cout << std::endl;
             pos = i;
             tempSmall = array[i];
             isSwapped = true;
@@ -41,6 +54,7 @@ int* selectionSort(int * array) {
     }
 
     if (isSwapped == true) {
+        std::cout << "Now swapping array[" << pos << "] and array[" << start_point << "]" << std::endl;
         swap(array[pos], array[start_point]);
         start_point++;
         selectionSort(array);
@@ -50,8 +64,16 @@ int* selectionSort(int * array) {
 }
 
 void print(int * array){
+    for (int i = 0; i < 20; i++) {
+        std::cout << i << " | ";
+    }
+    std::cout << std::endl;
+
     for(int i = 0; i < 20; i++) {
-        std::cout << array[i] << " ";
+        if (i <= 10)
+            std::cout << array[i] << " | ";
+        else
+            std::cout << array[i] << " |  ";
     }
     std::cout << std::endl;
 
