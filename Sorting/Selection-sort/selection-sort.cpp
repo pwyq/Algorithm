@@ -53,6 +53,8 @@ int* selectionSort(int * array) {
         }
     }
 
+    // TODO: A known bug, for the final run, the start_point will access array[20], which not exist.
+
     if (isSwapped == true) {
         std::cout << "Now swapping array[" << pos << "] and array[" << start_point << "]" << std::endl;
         swap(array[pos], array[start_point]);
