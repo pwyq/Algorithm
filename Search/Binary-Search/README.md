@@ -12,19 +12,21 @@ A binary search tree is a binary tree T such that:
 - otherwise, search for `k` in `T.right()`
 
 ##### Running Time
-search: O(lgn)
-insert, delete: O(n)
-Tree traversal: \theta(n)
+search: O(lgn)  
+insert, delete: O(n)  
+Tree traversal: &#920;(n)  
 min, max, predecessor, successor: O(1)
 
 ##### BST Minimum/Maximum
 > Find the min/max key in a tree rooted at x
 - Running time O(h) (proportional to the height of the tree)
 
+```
 TreeMin(x)
     while x.left() != NIL do
         x <- x.left()
     return x
+```
 
 ##### BST Successor
 Given `x`, find the node with the smallest key that greater than `x.key()`
@@ -36,7 +38,8 @@ Case I - Right Subtree of `x` is non-empty
 Case II - Right Subtree of `x` is empty
     Successor is the lowest ancestor of `x` whose left child is also an ancestor of `x`
 
-**BST Successor Pseudocode**  
+**BST Successor Pseudocode**
+```
 TreeSuccessor(x)  
     if x.right() != NIL  
         then return TreeMin(x.right())  
@@ -45,18 +48,23 @@ TreeSuccessor(x)
         x <- y  
         y <- y.parent()  
     return y
+```
+
 
 #### Pseudocode for BST Search
 
 > Recursive version - divide-and-conquer algorithm
+```
 Search(T, k)
     if T = NIL then return NIL
     if k = T.key() then return T
     if k < T.key()
         then return Search(T.left(),k)
         else return Search(T.right(),k)
+```
 
 > Iterative version
+```
 Search(T, k)
     x <- T
     while x != NIL and k != x.key() do
@@ -64,6 +72,7 @@ Search(T, k)
             then x <- x.left()
             else x <- x.right()
     return x
+```
 
 ##### BST Insertion Pseudocode
 > Basic Idea  
