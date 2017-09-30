@@ -14,6 +14,7 @@ A binary search tree is a binary tree T such that:
 ##### Running Time
 search: O(lgn)
 insert, delete: O(n)
+Tree traversal: \theta(n)
 min, max, predecessor, successor: O(1)
 
 ##### BST Minimum/Maximum
@@ -63,6 +64,29 @@ Search(T, k)
             then x <- x.left()
             else x <- x.right()
     return x
+
+##### BST Insertion Pseudocode
+> Basic Idea  
+- take an element (tree) `z` (whose left and right children are NIL) and insert it into `T`
+- find place in `T` where `z` belongs (as if searching for `z.key()`)
+- add `z` there
+
+```
+TreeInsert(T, z)
+y <- NIL
+x <- T
+while x != NIL
+    y <- x
+    if z.key() < x.key()
+        then x <- x.left()
+        else x <- x.right()
+z.setParent(y)
+if y != NIL
+    then if z.key() < y.key()
+        then y.setLeft(z)
+        else y.setRight(z)
+    else T <- z
+```
 
 #### Side Notes
 
