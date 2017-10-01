@@ -5,30 +5,6 @@
  * Last Modified Date: 28.09.2017
  * Last Modified By  : Yanqing Wu <meet.yanqing.wu@gmail.com>
  */
-/*****************************************
- * Instructions
- *  - Replace 'uwuserid' with your uWaterloo User ID
- *  - Select the current calendar term and enter the year
- *  - List students with whom you had discussions and who helped you
- *
- * uWaterloo User ID:  y433wu @uwaterloo.ca
- * Submitted for ECE 250
- * Department of Electrical and Computer Engineering
- * University of Waterloo
- * Calender Term of Submission:  (Fall) 2017
- *
- * By submitting this file, I affirm that
- * I am the author of all modifications to
- * the provided code.
- *
- * The following is a list of uWaterloo User IDs of those students
- * I had discussions with in preparing this project:
- *    -
- *
- * The following is a list of uWaterloo User IDs of those students
- * who helped me with this project (describe their help; e.g., debugging):
- *    -
- *****************************************/
 
 #ifndef DYNAMIC_STACK_H
 #define DYNAMIC_STACK_H
@@ -40,7 +16,6 @@
 #include "Exception.h"
 #include <iostream>
 using namespace std;
-
 
 class Dynamic_stack {
 
@@ -114,9 +89,7 @@ int Dynamic_stack::capacity() const {
 }
 
 
-void Dynamic_stack::push( int const &obj ) {
-    std::cout << "Detect one input: " << obj << std::endl;  // for debugging
-    
+void Dynamic_stack::push( int const &obj ) {   
     // if the array is full, create a new array with size 2n
     // and copy the elements from the current array to the new array in O(n)
 
@@ -158,7 +131,6 @@ int Dynamic_stack::pop() {
 }
 
 void Dynamic_stack::clear() {
-	// Enter your implementation here 
     // if current array size does not equal the initial size, delete the array
     // and create a new array equal to the initial size
     
