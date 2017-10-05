@@ -12,7 +12,7 @@ A binary search tree is a binary tree T such that:
 - otherwise, search for `k` in `T.right()`
 
 ##### Running Time
-search: O(lgn)  
+search: O(lgn)(best case) O(n)(worst case)  
 insert, delete: O(n)  
 Tree traversal: &#920;(n)  
 min, max, predecessor, successor: O(1)
