@@ -67,9 +67,7 @@ initial_size(n)
         array_size = 1;
         initial_size = 1;
     }
-    std::cout << "array hasn't been initialized, should have nothing: " << array << std::endl;
 	array = new int[array_size];
-    std::cout << "array has been initialized, should have an address: " << array << std::endl;
 }
 
 
@@ -120,6 +118,7 @@ void Dynamic_stack::push( int const &obj ) {
     // if the array is full, create a new array with size 2n
     // and copy the elements from the current array to the new array in O(n)
 
+    // When meets the current max capacity, double the array size
     if (size() == capacity()) {
         int * newArray = new int[capacity()];    // create a temporary array for copying
 
@@ -128,7 +127,6 @@ void Dynamic_stack::push( int const &obj ) {
             // std::cout << "array[" << i << "] address " << &array[i] << std::endl;
         }
         delete [] array;
-        std::cout << "array has been deallocated, should have nothing: " << array << std::endl;
 
         array = new int[2*capacity()];
         for (int i = 0; i < capacity(); i++) {
@@ -136,9 +134,8 @@ void Dynamic_stack::push( int const &obj ) {
             // std::cout << "newArray[" << i << "] address " << &newArray[i] << std::endl;
         }
         delete [] newArray;
-        std::cout << "newArray has been deallocated, should have nothing: " << array << std::endl;
 
-        array_size *= 2;
+        array_size *= 2;    // double array size
     }
 
     array[count] = obj;
@@ -149,10 +146,9 @@ void Dynamic_stack::push( int const &obj ) {
 int Dynamic_stack::pop() {
     if (empty() == false) {
         int topEntry = array[count - 1];    // Store the first entry that will be removed.
-
         array[count - 1] = 0;
-
         count--;
+
         return topEntry;
     }
     else {
@@ -161,32 +157,15 @@ int Dynamic_stack::pop() {
 }
 
 void Dynamic_stack::clear() {
-	// Enter your implementation here 
     // if current array size does not equal the initial size, delete the array
     // and create a new array equal to the initial size
     
-    // Re-initialize the counter
-    count = 0;
-    // Re-initialize the array_size
     if (array_size != initial_size) {
+        delete [] array;
+        array = new int[initial_size];
         array_size = initial_size;
     }
-
-    // Free memory
-    if (array == NULL) {
-        // std::cout << "array is null." << std::endl;
-    }
-    else {
-        // std::cout << "array is not null." << std::endl;
-        // std::cout << array << std::endl;
-        array = 0;
-        // if (empty() != true) {
-        //     std::cout << "It's not empty!" << std::endl;
-        //     delete [] array;
-        // }
-    }
-    // delete [] array; // If including this, will have delete same address array;
-                        // memory is not cleaned
-    
+    // Re-initialize the counter
+    count = 0;
 }
 #endif
