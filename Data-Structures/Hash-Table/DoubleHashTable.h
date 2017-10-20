@@ -1,10 +1,3 @@
-/**
- * File              : DoubleHashTable.h
- * Author            : Yanqing Wu <meet.yanqing.wu@gmail.com>
- * Date              : 08.10.2017
- * Last Modified Date: 08.10.2017
- * Last Modified By  : Yanqing Wu <meet.yanqing.wu@gmail.com>
- */
 #ifndef DOUBLE_HASH_TABLE_H
 #define DOUBLE_HASH_TABLE_H
 
@@ -64,7 +57,7 @@ array_state( new state[array_size] ) {
     //          one for storing the values in the hash table
     //          one for storing the status of the bins
    
-	for (int i = 0; i < array_size; ++i ) {
+	for (int i = 0; i < array_size; i++) {
 		array_state[i] = EMPTY;
         array[i] = 0;
 	}
@@ -105,12 +98,15 @@ int DoubleHashTable<T >::h1( T const &obj ) const {
 	// Description:
     // primary hash function (determine the bin)
     //  - (i % M)
+    //  - M is the capacity (here, array_size) of the hash table
     //  - adding M if the value is negative.
 
     int probe = (static_cast<int> (obj)) % capacity();
     while (probe < 0) {
         probe += capacity();
     }
+
+    // std::cout << "input obj: " << obj << ", returning probe: " << probe << std::endl;
 
 	return probe;
 }
@@ -143,15 +139,21 @@ bool DoubleHashTable<T >::member( T const &obj ) const {
     int probe = h1(obj);
     int offset = h2(obj);
     int counter = 0;
-    while (array[probe] != obj) {
-        if (array_state[probe] == EMPTY || counter == capacity()) {
+    // std::cout << "array[probe]: " << array[probe] << ", obj: " << obj << std::endl;  // for debugging
+    
+    while (array[probe] != obj && array_state[probe] != EMPTY) {
+        if (counter == capacity()) {
             return false;
         }
         probe = (probe + offset) % capacity();
         counter++;
     }
 
-	return true;
+    if (array[probe] == obj && array_state[probe] == OCCUPIED) {
+        return true;
+    }
+
+	return false;
 }
 
 template<typename T >
@@ -209,8 +211,8 @@ bool DoubleHashTable<T >::remove( T const &obj ) {
     int probe = h1(obj);
     int offset = h2(obj);
     int counter = 0;        // declare a counter to record iteration time
-    while(array[probe] != obj) {
-        if (array_state[probe] == EMPTY || counter == capacity()) {
+    while(array[probe] != obj && array_state[probe] != EMPTY) {
+        if (counter == capacity()) {
             return false;
         }
         probe = (probe + offset) % capacity();
@@ -218,10 +220,14 @@ bool DoubleHashTable<T >::remove( T const &obj ) {
     }
 
     // After finding the `obj` that need to be delete
-    array[probe] = 0;
-    array_state[probe] = DELETED;
-    count--;
-	return true;
+    if (array[probe] == obj && array_state[probe] == OCCUPIED) {
+        array[probe] = 0;
+        array_state[probe] = DELETED;
+        count--;
+        return true;
+    }
+    // If not finding the key, return false
+    return false;
 }
 
 template<typename T >
