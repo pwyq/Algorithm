@@ -2,7 +2,7 @@
  * File              : BST.cpp
  * Author            : Yanqing Wu <meet.yanqing.wu@gmail.com>
  * Date              : 11.10.2017
- * Last Modified Date: 11.10.2017
+ * Last Modified Date: 31.10.2017
  * Last Modified By  : Yanqing Wu <meet.yanqing.wu@gmail.com>
  */
 // Main structure credit to: https://gist.github.com/mgechev/5911348
@@ -18,6 +18,7 @@ struct Node {
     int key_value;
     Node *left;
     Node *right;
+    int count;
 };
 
 class BST {
@@ -105,6 +106,62 @@ class BST {
             }
             return leaf;
         }
+
+        void GreenEdgeHelper(Node *leaf)
+        {
+        	std::cout << "\ntest22222222" << std::endl;
+            static int greenEdgeCount = 0;
+            leaf->count = 0;
+            
+            std::cout << "Current leaf value: " << leaf->key_value << std::endl;
+            if (leaf->left == NULL && leaf->right == NULL) {
+                leaf->count = 1;
+                std::cout << "Reach a leaf!!!." << std::endl;
+                return;
+            }
+
+            if (leaf->left != NULL) {
+                leaf->count += 1;
+                GreenEdgeHelper(leaf->left);
+                std::cout << "Going to leffffffft sub-tree" << std::endl;
+            }
+            if(leaf->right != NULL) {
+                leaf->count += 1;
+                std::cout << "Going to righhhhhht sub-tree" << std::endl;
+                GreenEdgeHelper(leaf->right);
+            }
+
+            // End setting counter.
+
+            if (leaf->left != NULL)
+            	std::cout << "current node count: " << leaf->count << ", left-subtree count: " << leaf->left->count << std::endl;
+            if (leaf->right != NULL)
+            std::cout << "current node count: " << leaf->count << ", right-subtree count: " << leaf->right->count << std::endl;
+
+            if (leaf->count >0 && leaf->left != NULL) {
+            	if (leaf->count >= 2*leaf->left->count) {
+            		std::cout << "current node count: " << leaf->count << ", left-subtree count: " << leaf->left->count << std::endl;
+            		greenEdgeCount += 1;
+            	}
+            }
+            if (leaf->count >0 && leaf->right != NULL) {
+            	if (leaf->count >= 2*leaf->right->count) {
+            		std::cout << "current node count: " << leaf->count << ", right-subtree count: " << leaf->right->count << std::endl;
+            		greenEdgeCount += 1;
+            	}
+            }
+            // if (leaf->count >0 && (leaf->left != NULL || leaf->right != NULL)) {
+            //     if(leaf->count >= leaf->left->count) {
+            //         std::cout << "current node count: " << leaf->count << ", left-subtree count: " << leaf->left->count << std::endl;
+            //         greenEdgeCount += 1;
+            //     }
+            //     if(leaf->count >= leaf->right->count) {
+            //         std::cout << "current node count: " << leaf->count << ", left-subtree count: " << leaf->left->count << std::endl;
+            //         greenEdgeCount += 1;
+            //     }
+            // }
+            std::cout << "Number of Green Edges: " << greenEdgeCount << std::endl;
+        }
 // ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++  
     public:
 
@@ -123,6 +180,12 @@ class BST {
         void insert(int key);
         Node *search(int key);
         void destroy_tree();
+
+        void GreenEdge(Node *leaf) {
+            std::cout << "GreenEdge got called." << std::endl;
+            GreenEdgeHelper(leaf);
+            std::cout << "GreenEdge ended." << std::endl;
+        }
 
         void print() {
             printHelper(this->root);
@@ -219,6 +282,7 @@ Node *BST::search(int key, Node *leaf) {
     else
         return NULL;
 }
+
 
 // public version 
 void BST::insert(int key) {
@@ -317,7 +381,8 @@ int main() {
     std::cout << "Predecessor of 12 should be 11: " << mybst->TreePredecessor(12)->key_value << std::endl;
 
 
-
+    std::cout << "---------------------------------6" << std::endl;
+    mybst->GreenEdge(mytree); 
 
     mybst->destroy_tree();
     return 0;
