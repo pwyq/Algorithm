@@ -19,6 +19,8 @@ struct Node {
     Node *left;
     Node *right;
     int count;
+
+    Node(): count(0) {}
 };
 
 class BST {
@@ -109,59 +111,81 @@ class BST {
 
         void GreenEdgeHelper(Node *leaf)
         {
-        	std::cout << "\ntest22222222" << std::endl;
             static int greenEdgeCount = 0;
-            leaf->count = 0;
             
-            std::cout << "Current leaf value: " << leaf->key_value << std::endl;
             if (leaf->left == NULL && leaf->right == NULL) {
                 leaf->count = 1;
-                std::cout << "Reach a leaf!!!." << std::endl;
                 return;
             }
 
             if (leaf->left != NULL) {
                 leaf->count += 1;
                 GreenEdgeHelper(leaf->left);
-                std::cout << "Going to leffffffft sub-tree" << std::endl;
             }
             if(leaf->right != NULL) {
                 leaf->count += 1;
-                std::cout << "Going to righhhhhht sub-tree" << std::endl;
                 GreenEdgeHelper(leaf->right);
             }
 
             // End setting counter.
 
+            leaf->count = 1;    // reset
             if (leaf->left != NULL)
-            	std::cout << "current node count: " << leaf->count << ", left-subtree count: " << leaf->left->count << std::endl;
+                leaf->count += leaf->left->count;
             if (leaf->right != NULL)
-            std::cout << "current node count: " << leaf->count << ", right-subtree count: " << leaf->right->count << std::endl;
+                leaf->count += leaf->right->count;
 
-            if (leaf->count >0 && leaf->left != NULL) {
-            	if (leaf->count >= 2*leaf->left->count) {
-            		std::cout << "current node count: " << leaf->count << ", left-subtree count: " << leaf->left->count << std::endl;
-            		greenEdgeCount += 1;
-            	}
+            if (leaf->count > 0 && leaf->left != NULL) {
+                if (leaf->count >= 2*leaf->left->count) {
+                    std::cout << "current node count: " << leaf->count << ", left-subtree count: " << leaf->left->count << std::endl;
+                    greenEdgeCount += 1;
+                }
             }
-            if (leaf->count >0 && leaf->right != NULL) {
-            	if (leaf->count >= 2*leaf->right->count) {
-            		std::cout << "current node count: " << leaf->count << ", right-subtree count: " << leaf->right->count << std::endl;
-            		greenEdgeCount += 1;
-            	}
+            if (leaf->count > 0 && leaf->right != NULL) {
+                if (leaf->count >= 2*leaf->right->count) {
+                    std::cout << "current node count: " << leaf->count << ", right-subtree count: " << leaf->right->count << std::endl;
+                    greenEdgeCount += 1;
+                }
             }
-            // if (leaf->count >0 && (leaf->left != NULL || leaf->right != NULL)) {
-            //     if(leaf->count >= leaf->left->count) {
-            //         std::cout << "current node count: " << leaf->count << ", left-subtree count: " << leaf->left->count << std::endl;
-            //         greenEdgeCount += 1;
-            //     }
-            //     if(leaf->count >= leaf->right->count) {
-            //         std::cout << "current node count: " << leaf->count << ", left-subtree count: " << leaf->left->count << std::endl;
-            //         greenEdgeCount += 1;
-            //     }
-            // }
             std::cout << "Number of Green Edges: " << greenEdgeCount << std::endl;
+            std::cout << "Go back to last level." << std::endl;
         }
+        // {
+        //     int greenEdgeCount = 0;
+
+        //     if (leaf->left == NULL && leaf->right == NULL) {
+        //         leaf->count = 1;
+        //         return greenEdgeCount;
+        //     }
+
+        //     int count = 0;
+
+        //     if (leaf->left != NULL && leaf->left->count == 0) {
+        //         greenEdgeCount += GreenEdgeHelper(leaf->left);
+        //     }
+        //     count += leaf->count;
+
+        //     if (leaf->right != NULL && leaf->right->count == 0) {
+        //         greenEdgeCount += GreenEdgeHelper(leaf->right);
+        //     }
+        //     count += leaf->count;
+        //     leaf->count = count;
+        //     if (leaf->left != NULL) {
+        //         if (leaf->count >= 2*leaf->left->count)
+        //             std::cout << "curr: " << leaf->key_value << ", count: " << leaf->count << std::endl;
+        //             std::cout << "left: " << leaf->left->key_value << ", count: " << leaf->left->count << std::endl << std::endl;
+        //             greenEdgeCount += 1;
+        //     }
+        //     if (leaf->right != NULL) {
+        //         if (leaf->count >= 2*leaf->right->count)
+        //             std::cout << "curr: " << leaf->key_value << ", count: " << leaf->count << std::endl;
+        //             std::cout << "right: " << leaf->right->key_value << ", count: " << leaf->right->count << std::endl << std::endl;
+        //             greenEdgeCount += 1;
+        //     }
+        //     return greenEdgeCount;
+        // }
+
+
 // ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++  
     public:
 
@@ -382,7 +406,24 @@ int main() {
 
 
     std::cout << "---------------------------------6" << std::endl;
-    mybst->GreenEdge(mytree); 
+    mybst->GreenEdge(mytree);
+
+
+    BST *mybst2 = new BST();
+    mybst2->insert(100);
+    mybst2->insert(50);
+    mybst2->insert(150);
+    mybst2->insert(25);
+    mybst2->insert(160);
+    mybst2->insert(75);
+    mybst2->insert(90);
+    mybst2->insert(10);
+    mybst2->insert(140);
+
+    Node *mytree2 = new Node();
+    mytree2 = mybst2->getRoot();
+    mybst2->GreenEdge(mytree2);
+
 
     mybst->destroy_tree();
     return 0;
