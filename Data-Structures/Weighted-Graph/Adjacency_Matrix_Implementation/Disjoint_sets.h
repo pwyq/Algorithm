@@ -104,8 +104,8 @@ void Disjoint_set::union_sets(int node_index1, int node_index2) {
 
     // when node1 and node2 in the same set
     if (find_set(node_index1) == find_set(node_index2)) {
-        // cout << "\ntest-1: " << find_set(node_index1) << endl;
-        // cout << "\ntest-2: " << find_set(node_index2) << endl;
+        cout << "\ntest-1: " << find_set(node_index1) << endl;
+        cout << "\ntest-2: " << find_set(node_index2) << endl;
         return ;
     }
 

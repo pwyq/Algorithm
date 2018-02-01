@@ -1,3 +1,4 @@
+
 /*****************************************
  * Instructions
  *  - Replace 'uwuserid' with your uWaterloo User ID
@@ -22,7 +23,6 @@
  * who helped me with this project (describe their help; e.g., debugging):
  *    -
  *****************************************/
-
 #ifndef WEIGHTED_GRAPH_H
 #define WEIGHTED_GRAPH_H
 
@@ -35,228 +35,366 @@
 #include "Exception.h"
 #include "Disjoint_sets.h"
 
+
+#include <stdio.h>
+
+struct AdjListNode {
+    int dest;
+    double weight;
+    AdjListNode *next;
+};
+
 using namespace std;
 
 class Weighted_graph {
-	private:
-		static const double INF;
-		double** graph;             // adjacency matrix
-		int num_nodes;
-		int num_edges;
-		
-		// Do not implement these functions!
-		// By making these private and not implementing them, any attempt
-		// to make copies or assignments will result in errors
-		Weighted_graph( Weighted_graph const & );
-		Weighted_graph &operator=( Weighted_graph );
+    private:
+        static const double INF;
+        int num_nodes;
+        int num_edges;
 
-		// your choice
+        // Do not implement these functions!
+        // By making these private and not implementing them, any attempt
+        // to make copies or assignments will result in errors
+        Weighted_graph( Weighted_graph const & );
+        Weighted_graph &operator=( Weighted_graph );
 
-	public:
-		Weighted_graph( int = 10 );
-		~Weighted_graph();
+        // your choice
+        AdjListNode **adjList;
 
-		int degree( int ) const;
-		int edge_count() const;
-		std::pair<double, int> minimum_spanning_tree() const;
+    public:
+        Weighted_graph( int = 10 );
+        ~Weighted_graph();
 
-		bool insert_edge( int, int, double );
-		bool erase_edge( int, int );
-		void clear_edges();
+        int degree( int ) const;
+        int edge_count() const;
+        std::pair<double, int> minimum_spanning_tree() const;
 
-	// Friends
+        bool insert_edge( int, int, double );
+        bool erase_edge( int, int );
+        void clear_edges();
 
-	friend std::ostream &operator<<( std::ostream &, Weighted_graph const & );
+    // Friends
+
+    friend std::ostream &operator<<( std::ostream &, Weighted_graph const & );
 };
 
 const double Weighted_graph::INF = std::numeric_limits<double>::infinity();
 
 Weighted_graph::Weighted_graph(int n ) {
-
     if (n < 0) {
         throw illegal_argument();
     }
 
     num_nodes = n;
     num_edges = 0;
-
-    graph = new double *[n];        // row
-    for (int i = 0; i < n; i++) {
-        graph[i] = new double[n];   // column
-    }
-
-    for (int i = 0; i < n; i++) {
-        for (int j = 0; j < n; j++) {
-            graph[i][j] = INF;
-        }
-    }
-    // cout << "test-3: " << INF << endl;
+    // adjList points to an array of pointers of type AdjListNode*
+    adjList = new AdjListNode*[n];
 }
 
 Weighted_graph::~Weighted_graph() {
-    
-    for (int i = 0; i < num_nodes; i++) {
-        delete [] graph[i];
-    }
-    delete [] graph;
+    clear_edges();
+    delete [] adjList;
     num_nodes = 0;
 }
 
 int Weighted_graph::degree(int u) const {
-    // Returns the degree of the vertex n. Throw an illegal_argument exception if the argument does
-    // not corerespond to an existing vertex
-    
     if (u < 0 || u > num_nodes-1) {
         throw illegal_argument();
     }
-
     int degrees = 0;
-    for (int i = 0; i < num_nodes; i++) {
-        if (graph[u][i] != INF) {
-            degrees++;
-        }
+    AdjListNode *trav = adjList[u];
+    while (trav != NULL) {
+        degrees++;
+        trav = trav->next;
     }
 
-	return degrees;
-
+    return degrees;
 }
 
-int Weighted_graph::edge_count() const {
-    // Returns the number of edges in the graph
-	return num_edges;
-}
+int Weighted_graph::edge_count() const { return num_edges; }
 
 bool Weighted_graph::erase_edge(int i, int j) {
-    // If an edge between nodes i and j exists, remove the edge
-    // If i == j, returns true; if no edge esists, return false
-    // If i and/or j are outside the range of [0, n-1], throw an illegal_argument exception
- 
     if ((i < 0 || i > num_nodes-1) || (j < 0 || j > num_nodes-1)) {
         throw illegal_argument();
     }   
+    if (i == j) { return true; }
 
-    if (i == j) {
-        return true;
+    if (adjList[i] == NULL || adjList[j] == NULL) { return false; }
+
+    AdjListNode *trav_I = adjList[i];
+    AdjListNode *trav_J = adjList[j];
+    bool isJFound = false;
+    bool isIFound = false;
+    while (trav_I != NULL) {
+        if (j == trav_I->dest) { isJFound = true; break; }
+        trav_I = trav_I->next;
+    }
+    while (trav_J != NULL) {
+        if (i == trav_J->dest) { isIFound = true; break; }
+        trav_J = trav_J->next;
+    }
+    if ((isJFound == false) || (isIFound == false)) { return false; }
+                        /*  VALIDATION CHECKING END   */
+
+                        /*  DELETE I-J   */
+    trav_I = adjList[i];    // reset position to the head
+    trav_J = adjList[j];
+    // 1. delete at the head
+    if ((j == trav_I->dest) && (trav_I->next == NULL)) {
+        delete trav_I;
+        adjList[i] = NULL;
+        num_edges--;
+    }
+    // 2. delete at the middle
+    else if (trav_I->next != NULL) {
+        while (trav_I && trav_I->next != NULL) {
+            if ((j == trav_I->next->dest) && (trav_I->next->next != NULL)) {
+                AdjListNode *doomed = trav_I->next;
+                trav_I->next = trav_I->next->next;
+                delete doomed;
+                num_edges--;
+                break;
+            }
+            trav_I = trav_I->next;
+        }
+    }
+    // 3. delete at the tail
+    trav_I = adjList[i];
+    while (trav_I && trav_I->next != NULL) {
+        if ((j == trav_I->next->dest) && (trav_I->next->next == NULL)) {
+            AdjListNode *doomed = trav_I->next;
+            trav_I->next = NULL;
+            delete doomed;
+            num_edges--;
+            break;
+        }
+        trav_I = trav_I->next;
+    }
+                        /*  DELETE J-I   */
+    if ((i == trav_J->dest) && (trav_J->next == NULL)) {
+        delete trav_J;
+        adjList[j] = NULL;
+    }
+    else if (trav_J->next != NULL) {
+        while (trav_J && trav_J->next != NULL) {
+            if ((i == trav_J->next->dest) && (trav_J->next->next != NULL)) {
+                AdjListNode *doomed = trav_J->next;
+                trav_J->next = trav_J->next->next;
+                delete doomed;
+                break;
+            }
+            trav_J = trav_J->next;
+        }
     }
 
-    if (graph[i][j] == INF) {
-        return false;
+    trav_J = adjList[j];
+    while (trav_J && trav_J->next != NULL) {
+        if ((i == trav_J->next->dest) && (trav_J->next->next == NULL)) {
+            AdjListNode *doomed = trav_J->next;
+            trav_J->next = NULL;
+            break;
+        }
+        trav_J = trav_J->next;
     }
 
-    graph[i][j] = INF;
-    graph[j][i] = INF;
-
-    num_edges--;
-
-	return true;
+    cout << "\nTest-printing" << endl;
+    for (int i = 0; i < num_nodes; i++) {
+        cout << i << ": ";
+        AdjListNode *temp = adjList[i];
+        while (temp) {
+            cout << temp->dest << "(w: " << temp->weight << ")->";
+            temp = temp->next;
+        }
+        cout << "GROUND." << endl;
+    }
+    return true;
 }
 
 void Weighted_graph::clear_edges() {
-    // Removes all edges from the graph
+
     for (int i = 0; i < num_nodes; i++) {
-        for (int j = 0; j < num_nodes; j++) {
-            graph[i][j] = INF;
+        if (adjList[i] != NULL) {
+            AdjListNode *curr = adjList[i];
+            while (curr != NULL) {
+                AdjListNode *prev = curr;
+                curr = curr->next;
+                delete prev;
+            }
+            adjList[i] = NULL;
         }
     }
+
+    cout << "\nTest-printing" << endl;
+    for (int i = 0; i < num_nodes; i++) {
+        cout << i << ": ";
+        AdjListNode *temp = adjList[i];
+        while (temp) {
+            cout << temp->dest << "(w: " << temp->weight << ")->";
+            temp = temp->next;
+        }
+        cout << "GROUND." << endl;
+    }
     num_edges = 0;
-	return;
+    return;
 }
 
 bool Weighted_graph::insert_edge( int i, int j, double d ) {
-    // If i == j, and they are in the graph, return false
-    // If i != j,
-    //      add a new edge Eij
-    //      or, if the edge Eij exists, update the weight and return true
-
-    // Validation input checking
     if ((i < 0 || i > num_nodes-1) || (j < 0 || j > num_nodes-1) || (d <= 0)) {
         throw illegal_argument();
     }
+    if (i == j) { return false; }
+    cout << "\n\t~~~~~~~~~Insert Edge: " << i << "-" << j << ", " << d << endl;
 
-    if (i == j){
-        return false;
-    }
-    
-    // Only when the edges is not connected, we increment the num of edges
-    if (graph[i][j] == INF) {
+    if (adjList[i] == NULL) {
+        AdjListNode *new_I = new AdjListNode;
+        new_I->dest = j;
+        new_I->weight = d;
+        new_I->next = NULL;
+        adjList[i] = new_I;
         num_edges++;
-    }
-
-    graph[i][j] = d;
-    graph[j][i] = d;
-
-    // cout << "\ni = " << i << ", j = " << j << ", i-j = " << d << ", edges = " << num_edges << endl;
-
-	return true;
-}
-
-std::pair<double, int> Weighted_graph::minimum_spanning_tree() const {
-    /*
-    Requirements: Uses Kruskal's algorithm to find the MST
-    Returns the weight of the MST and the number of edges that were tested for adding into the MST
-    Use Disjoint sets to ensure the MST is valid (ie, no loops in the tree)
-    */
-    
-    // std::cout << "\n==== pair func got called ====" << std::endl;
-
-    if (num_edges == 0) {
-        return std::pair<double, int>(0.0, 0);
-    }
-
-    Disjoint_set MST(num_nodes);
-    double totalWeights = 0.0;
-    int testedEdges = 0;
-
-    // Sort the edges in non-decreasing order
-    double weights[num_edges][3];
-    int counter = 0;
-    for (int i = 0; i < num_nodes; i++) {
-        for (int j = i+1; j < num_nodes; j++) {
-            if (graph[i][j] != INF) {
-                // cout << "\ncounter: " << counter << endl;
-                // cout << "(i,j) = (" << i << ", " << j << "). weight: " << graph[i][j] << endl;
-                weights[counter][0] = graph[i][j];  // store weight
-                weights[counter][1] = i;            // store first node
-                weights[counter][2] = j;            // store second node
-                counter++;
+    } else {
+        AdjListNode *trav_I = adjList[i];
+        AdjListNode *last_I = adjList[i];
+        // check if the node is already exist, if so, update the weight; otherwise,
+        // add to the end
+        bool isFound = false;
+        while (trav_I != NULL) {
+            // Find the repeated edge, now update its weight
+            // cout << "j: " << j << ", next node is: " << trav_I->dest << endl;
+            if (j == trav_I->dest) {
+                trav_I->weight = d;
+                isFound = true;
+                break;
             }
-
+            trav_I = trav_I->next;
+            if (last_I->next != NULL) { last_I = last_I->next; }
+        }
+        // Notice that trav_I is null here! So can't use it!
+        if (isFound == false) {
+            AdjListNode *newNode = new AdjListNode;
+            newNode->dest = j;
+            newNode->weight = d;
+            newNode->next = NULL;
+            last_I->next = newNode;
+            num_edges++;
         }
     }
 
-    // cout << "Building the MST!!!!!!!!!!!!!!!!!!!!! " << num_edges << endl;
+    if (adjList[j] == NULL) {
+        AdjListNode *new_J = new AdjListNode;
+        new_J->dest = i;
+        new_J->weight = d;
+        new_J->next = NULL;
+        adjList[j] = new_J;
+    } else {
+        AdjListNode *trav_J = adjList[j];
+        AdjListNode *last_J = adjList[j];
+        bool isFound = false;
+        while (trav_J != NULL) {
+            if (i == trav_J->dest) {
+                trav_J->weight = d;
+                isFound = true;
+                break;
+            }
+            trav_J = trav_J->next;
+            if (last_J->next != NULL) { last_J = last_J->next; }
+        }
+        if (isFound == false) {
+            AdjListNode *newNode = new AdjListNode;
+            newNode->dest = i;
+            newNode->weight = d;
+            newNode->next = NULL;
+            last_J->next = newNode;
+        }
+    }
+
+    cout << "\nTest-printing" << endl;
+    for (int i = 0; i < num_nodes; i++) {
+        cout << i << ": ";
+        AdjListNode *temp = adjList[i];
+        while (temp) {
+            cout << temp->dest << "(w: " << temp->weight << ")->";
+            temp = temp->next;
+        }
+        cout << "GROUND." << endl;
+    }
+    return true;
+}
+
+std::pair<double, int> Weighted_graph::minimum_spanning_tree() const {
+    // if (num_edges == 0) { return std::pair<double, int>(0.0, 0); }
+
+    Disjoint_set MST(num_nodes);
+
+    // 1. store unique edges edges
+    double weights[num_edges][3];
+    int counter = 0;
+    for (int i = 0; i < num_nodes; i++) {     
+        if (adjList[i] != NULL) {
+            AdjListNode *temp = adjList[i];
+            while (temp != NULL) {
+                bool isSameEdge = false;
+                for (int j = 0; j < counter; j++) {
+                    if (temp->weight == weights[j][2]) {
+                        if ((temp->dest == weights[j][0]) && (i == weights[j][1])) {
+                            isSameEdge = true;
+                        }
+                    }
+                }
+                if (isSameEdge == false) {                
+                    weights[counter][0] = i;            // first node
+                    weights[counter][1] = temp->dest;   // second node
+                    weights[counter][2] = temp->weight;
+                    counter++;
+                }
+                temp = temp->next;
+            }
+        }
+    }
+
+    cout << "hallelujah" << endl;
+    for (int i = 0; i < counter; i++) {
+        for (int j = 0; j < 3; j++) {
+            cout << weights[i][j] << " ";
+        }
+        cout << endl;
+    }
+
+    double totalWeights = 0.0;
+    int testedEdges = 0;
     while (MST.num_sets() != 1 && testedEdges < num_edges) {
         // Find the smallest weight on adjacent nodes
         double tempWeight = INF;
         int tempIdx = 0;
         for(int i = 0; i < num_edges; i++) {
-            if(weights[i][0] < tempWeight) {
-                tempWeight = weights[i][0];
+            if(weights[i][2] < tempWeight) {
+                tempWeight = weights[i][2];
                 tempIdx = i;
                 // cout << "i = " << i << ", temp_weight = " << tempWeight << endl;
             }
         }
 
-        int u = weights[tempIdx][1];
-        int v = weights[tempIdx][2];
+        int u = weights[tempIdx][0];
+        int v = weights[tempIdx][1];
 
-        // cout << "(u,v) = (" << u << ", " << v << "). weight: " << weights[tempIdx][0] << endl;
+        cout << "(u,v) = (" << u << ", " << v << "). weight: " << weights[tempIdx][2] << endl;
         if (MST.find_set(u) != MST.find_set(v)) {
             // cout << "______________INSIDE______________" << endl;
             MST.union_sets(u, v);
-            totalWeights += weights[tempIdx][0];
+            totalWeights += weights[tempIdx][2];
         }
-        weights[tempIdx][0] = INF;
+        weights[tempIdx][2] = INF;
 
         testedEdges++;
         // cout << "tested edges: " << testedEdges << endl;
     }
 
-	return std::pair<double, int>(totalWeights, testedEdges);
+
+
+    return std::pair<double, int>( totalWeights, testedEdges );
 }
 
 std::ostream &operator<<( std::ostream &out, Weighted_graph const &graph ) {
-	return out;
+    return out;
 }
-
 #endif
